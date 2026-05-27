@@ -1,0 +1,22 @@
+# Virtual environment
+myenv/
+venv/
+.venv/
+
+# Data files (too large for GitHub; download from Kaggle locally)
+*.csv
+
+# Nested clone folder (optional local copy of remote repo)
+Ai-Job-Analyzer/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Environment & IDE
+.env
+.streamlit/secrets.toml
+.idea/
+.vscode/
