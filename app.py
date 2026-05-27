@@ -25,10 +25,39 @@ df = load_data()
 if df is None:
     st.stop()
 
+df_full = df.copy()
+
 # ── HEADER ────────────────────────────────────────────────
 st.title("📊 Job Market Analyzer")
 st.markdown("Insights from **123,000+ real job postings** — powered by LinkedIn data")
 st.divider()
+
+# ── SIDEBAR FILTERS ───────────────────────────────────────
+st.sidebar.header("🔍 Filter Data")
+st.sidebar.markdown("Choose what you want to see:")
+
+exp_choice = st.sidebar.selectbox(
+    "Experience Level",
+    ["All"] + sorted(df_full["formatted_experience_level"].dropna().unique().tolist()),
+)
+work_choice = st.sidebar.selectbox(
+    "Work Type",
+    ["All"] + sorted(df_full["formatted_work_type"].dropna().unique().tolist()),
+)
+remote_choice = st.sidebar.selectbox(
+    "Remote / On-site",
+    ["All"] + sorted(df_full["remote_allowed"].unique().tolist()),
+)
+
+df = df_full.copy()
+if exp_choice != "All":
+    df = df[df["formatted_experience_level"] == exp_choice]
+if work_choice != "All":
+    df = df[df["formatted_work_type"] == work_choice]
+if remote_choice != "All":
+    df = df[df["remote_allowed"] == remote_choice]
+
+st.sidebar.caption(f"Showing **{len(df):,}** of {len(df_full):,} postings")
 
 # ── TOP METRICS ───────────────────────────────────────────
 col1, col2, col3, col4 = st.columns(4)
@@ -93,6 +122,28 @@ fig5 = px.histogram(
 fig5.update_layout(bargap=0.1)
 st.plotly_chart(fig5, use_container_width=True)
 
+# ── SALARY BY JOB TITLE ───────────────────────────────────
+st.subheader("💰 Average Salary by Job Title (Top 15)")
+salary_by_title = (
+    df[df["normalized_salary"] > 20000]
+    .groupby("title")["normalized_salary"]
+    .mean()
+    .sort_values(ascending=False)
+    .head(15)
+    .reset_index()
+)
+salary_by_title.columns = ["Job Title", "Avg Salary"]
+fig_salary = px.bar(
+    salary_by_title,
+    x="Avg Salary",
+    y="Job Title",
+    orientation="h",
+    color="Avg Salary",
+    color_continuous_scale="Greens",
+)
+fig_salary.update_layout(yaxis={"categoryorder": "total ascending"})
+st.plotly_chart(fig_salary, use_container_width=True)
+
 # ── ROW 4: TOP COMPANIES ──────────────────────────────────
 st.subheader("🏢 Top 15 Hiring Companies")
 top_companies = df['company_name'].value_counts().head(15).reset_index()
@@ -104,6 +155,26 @@ fig6 = px.bar(
 )
 fig6.update_layout(yaxis={'categoryorder': 'total ascending'}, height=450)
 st.plotly_chart(fig6, use_container_width=True)
+
+# ── JOB SEARCH ────────────────────────────────────────────
+st.divider()
+st.subheader("🔎 Search Jobs")
+search_query = st.text_input("Search by job title or keyword")
+if search_query:
+    results = df[df["title"].str.contains(search_query, case=False, na=False)]
+    st.write(f"Found **{len(results):,}** matching postings")
+    display_cols = [
+        "title",
+        "company_name",
+        "location",
+        "formatted_work_type",
+        "formatted_experience_level",
+        "normalized_salary",
+    ]
+    st.dataframe(
+        results[display_cols].head(50),
+        use_container_width=True,
+    )
 
 # ── FOOTER ────────────────────────────────────────────────
 st.divider()
