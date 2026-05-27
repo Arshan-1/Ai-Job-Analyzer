@@ -18,7 +18,7 @@ cd Ai-Job-Analyzer
 
 ### 2. Get the data
 
-Download the dataset from Kaggle: [LinkedIn Job Postings](https://www.kaggle.com/datasets/arshan-1-or-similar) (search **"LinkedIn Job Postings"** on Kaggle).
+Download the [LinkedIn Job Postings dataset on Kaggle](https://www.kaggle.com/datasets) (search **"LinkedIn Job Postings"**).
 
 Place `postings.csv` in the project folder, then run:
 
