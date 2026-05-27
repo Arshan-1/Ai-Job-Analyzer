@@ -107,7 +107,7 @@ st.plotly_chart(fig6, use_container_width=True)
 
 # ── FOOTER ────────────────────────────────────────────────
 st.divider()
-st.caption("Built with Streamlit · Data from LinkedIn Job Postings (Kaggle) · AI Analyst powered by Mistral")
+st.caption("Built with Streamlit · Pandas · Plotly · LangChain · Mistral (Ollama)")
 
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
